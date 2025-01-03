@@ -8,6 +8,7 @@ import org.json.simple.parser.JSONParser;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * https://univcert.com   메일 및 대학 인증 API.
@@ -15,7 +16,9 @@ import java.util.Map;
  * https://github.com/in-seo/univcert  에 자세한 내용 있고,
  * 도움이 되셨다면 스타 한번 눌러주시면 큰 힘이 됩니다. 많이 퍼뜨려 주세요 감사합니다 :)
  */
-public class UnivCert {
+public class UnivCert { 
+	
+	public static final String API_KEY = "79a49992-f87c-479b-9a55-592b9f290f9a";
     /** 모든 반환 값은 Map<String, Object>로 드립니다. 반환 값을 .get("success") 와 같은 메서드로 뽑아 쓰시면 됩니다. */
     private static final String baseURL = "https://univcert.com/api";
     private static final OkHttpClient client = new OkHttpClient();
@@ -32,12 +35,13 @@ public class UnivCert {
         postObj.put("email", email);
         postObj.put("univName", universityName);
         postObj.put("univ_check", univ_check); /** true -> 대학 도메인까지, false -> 단순 메일 인증만 */
-
+        
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postObj.toJSONString());
         builder.post(requestBody);
         Request request = builder.build();
 
         Response responseHTML = client.newCall(request).execute();
+        System.out.println("certify가 실행되었습니다. 결과값을 반환합니다. (내부 코드 변경)");
 
         return parseHTMLToJSON(responseHTML);
     }
@@ -156,5 +160,23 @@ public class UnivCert {
         }
         return map;
     }
+    public static void main(String[] args) {
+    	try {
+    	UnivCert.clear(API_KEY);
+    	Map<String,Object> temp = UnivCert.certify(API_KEY, "kkjj1211@naver.com", "", false);
+		System.out.println(temp);
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("코드를 입력해주세요 : ");
+		int code = sc.nextInt();
+
+		temp = UnivCert.certifyCode(API_KEY, "kkjj1211@naver.com", "", code);
+		System.out.println();
+    	
+    	catch(Exception e) {
+    		
+    	}
+	}
+
 }
 
